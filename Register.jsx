@@ -1,38 +1,66 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import axiosInstance from '../api/axiosInstance';
 
 const Register = () => {
-  const [code, setCode] = useState("");
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState('');
+  const [codeNo, setCodeNo] = useState('');
+  const [phoneNo, setPhoneNo] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleRegister = () => {
-    alert(`Registered with Code: ${code}, Phone: ${phone}`);
-    // Here you would send data to the backend
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axiosInstance.post('/register', {
+        fullName,
+        codeNo,
+        phoneNo,
+        password,
+      });
+      if (response.data.success) {
+        alert('Registration successful');
+        window.location.href = '/login';
+      } else {
+        alert('Registration failed');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error during registration');
+    }
   };
 
   return (
-    <div className="register-container">
+    <form onSubmit={handleRegister}>
       <h2>Register</h2>
       <input
         type="text"
-        placeholder="Code Number"
-        value={code}
-        onChange={(e) => setCode(e.target.value)}
+        placeholder="Full Name"
+        value={fullName}
+        onChange={(e) => setFullName(e.target.value)}
+        required
       />
       <input
-        type="tel"
+        type="text"
+        placeholder="Code Number"
+        value={codeNo}
+        onChange={(e) => setCodeNo(e.target.value)}
+        required
+      />
+      <input
+        type="text"
         placeholder="Phone Number"
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
+        value={phoneNo}
+        onChange={(e) => setPhoneNo(e.target.value)}
+        required
       />
       <input
         type="password"
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        required
       />
-      <button onClick={handleRegister}>Register</button>
-    </div>
+      <button type="submit">Register</button>
+    </form>
   );
 };
 
