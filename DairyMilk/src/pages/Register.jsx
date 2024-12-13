@@ -28,10 +28,13 @@ const Register = () => {
         localStorage.setItem('userToken', token);
       }
   
-      toast.success(response.data.message || "Registered successfully");
-  
-      // Redirect to the counter page after successful registration
-      navigate("/counter");
+      if(role === "counter"){
+        navigate("/counter");
+        toast.success("Counter Registrer Successfully");
+      }else{
+        navigate("/collectordashboard");
+        toast.success("Collector Registrer Successfully");
+      }
     } catch (error) {
       console.error("API Error:", error); // Log full error for debugging
       if (error.response) {
