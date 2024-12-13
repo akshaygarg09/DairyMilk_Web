@@ -1,19 +1,46 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import axios from "axios"; // Import Axios
 
 const Register = () => {
-  const [code, setCode] = useState("");
+  const [username, setusername] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-  const navigate=useNavigate();
-
-  const handleRegister = () => {
-    navigate("/counter");
-    toast.success("Register Successfully")
-    // Here you would send data to the backend
+  const handleRegister = async () => {
+    try {
+      // Make API call to the backend
+      const response = await axios.post("http://localhost:3000/api/register", {
+        username,
+        phone,
+        password,
+        role: "counter", // Ensure role is passed as "counter"
+      });
+  
+      // Extract token from response
+      const { token } = response.data;
+  
+      // Save token to local storage
+      if (token) {
+        localStorage.setItem('userToken', token);
+      }
+  
+      toast.success(response.data.message || "Registered successfully");
+  
+      // Redirect to the counter page after successful registration
+      navigate("/counter");
+    } catch (error) {
+      console.error("API Error:", error); // Log full error for debugging
+      if (error.response) {
+        toast.error(error.response.data.message || "Registration failed");
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
+    }
   };
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -25,9 +52,9 @@ const Register = () => {
         <div className="space-y-4">
           <input
             type="text"
-            placeholder="Code Number"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setusername(e.target.value)}
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 

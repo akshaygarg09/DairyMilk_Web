@@ -3,54 +3,66 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios"; // Import Axios
 
-const Login = () => {
-  const [name, setName] = useState("");
+const Adminregister = () => {
+  const [username, setusername] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
+  const handleRegister = async () => {
     try {
-      // Make API call using Axios
-      const response = await axios.post("http://localhost:3000/api/login", { username:name, password });
-
-      const { token, role } = response.data;
-
-      // Save the JWT token in localStorage
-      localStorage.setItem("jwt_token", token);
-
-      // Check the role and navigate accordingly
-      if (role === "counter") {
-        navigate("/counter");
-        toast.success("Counter Login Successful");
-      } else if (role === "admin") {
-        navigate("/admin");
-        toast.success("Admin Login Successful");
-      } else {
-        toast.error("Unknown role. Please contact support.");
+      // Make API call to the backend
+      const response = await axios.post("http://localhost:3000/api/adminregister", {
+        username,
+        phone,
+        password,
+        role: "admin", // Ensure role is passed as "counter"
+      });
+  
+      // Extract token from response
+      const { token } = response.data;
+  
+      // Save token to local storage
+      if (token) {
+        localStorage.setItem('userToken', token);
       }
+  
+      toast.success(response.data.message || "Registered successfully");
+  
+      // Redirect to the counter page after successful registration
+      navigate("/admin");
     } catch (error) {
-      // Handle errors from Axios
+      console.error("API Error:", error); // Log full error for debugging
       if (error.response) {
-        toast.error(error.response.data.message || "Login failed");
+        toast.error(error.response.data.message || "Registration failed");
       } else {
-        console.error("Error logging in:", error.message);
         toast.error("Something went wrong. Please try again.");
       }
     }
   };
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 shadow-lg rounded-lg w-full max-w-md">
         <h2 className="text-2xl font-bold text-center text-gray-700 mb-6">
-          Login
+          Admin Register
         </h2>
 
         <div className="space-y-4">
           <input
+            type="text"
             placeholder="Username"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={username}
+            onChange={(e) => setusername(e.target.value)}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+
+          <input
+            type="tel"
+            placeholder="Phone Number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
@@ -63,20 +75,20 @@ const Login = () => {
           />
 
           <button
-            onClick={handleLogin}
+            onClick={handleRegister}
             className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition duration-300"
           >
-            Login
+            Register
           </button>
         </div>
 
         <p className="mt-6 text-center text-gray-600">
-          Not registered?{" "}
+          Already have an account?{" "}
           <a
-            href="/register"
+            href="/"
             className="text-blue-500 hover:underline hover:text-blue-600"
           >
-            Register here
+            Login here
           </a>
         </p>
       </div>
@@ -84,4 +96,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Adminregister;
