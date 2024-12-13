@@ -25,7 +25,10 @@ const Login = () => {
       } else if (role === "admin") {
         navigate("/admin");
         toast.success("Admin Login Successful");
-      } else {
+      } else if(role === "collector"){
+        navigate("/collectordashboard");
+        toast.success("Collector Login Successful");
+      }else {
         toast.error("Unknown role. Please contact support.");
       }
     } catch (error) {
@@ -48,7 +51,7 @@ const Login = () => {
 
         <div className="space-y-4">
           <input
-            placeholder="Username"
+            placeholder="Code Number"
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"

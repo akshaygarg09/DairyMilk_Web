@@ -10,15 +10,15 @@ const Counter = () => {
         <h2 className="text-2xl font-bold text-gray-700 mb-6">Counter Login</h2>
         <div className="space-y-4">
           <button
-            onClick={() => navigate("/milk-purchase")}
-            className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-lg transition duration-300"
+            onClick={() => navigate("/milkpurchase")}
+            className="w-full bg-blue-500 text-white font-semibold py-2 rounded-lg transition duration-300"
           >
             Milk Purchasing
           </button>
 
           <button
-            onClick={() => navigate("/milk-sell")}
-            className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded-lg transition duration-300"
+            onClick={() => navigate("/milksell")}
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition duration-300"
           >
             Milk Selling
           </button>

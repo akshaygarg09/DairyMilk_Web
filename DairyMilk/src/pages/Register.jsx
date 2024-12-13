@@ -4,19 +4,20 @@ import { toast } from "react-toastify";
 import axios from "axios"; // Import Axios
 
 const Register = () => {
-  const [username, setusername] = useState("");
+  const [codenum, setCodenum] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole]=useState("");
   const navigate = useNavigate();
 
   const handleRegister = async () => {
     try {
       // Make API call to the backend
       const response = await axios.post("http://localhost:3000/api/register", {
-        username,
+        username : codenum,
         phone,
         password,
-        role: "counter", // Ensure role is passed as "counter"
+        role, 
       });
   
       // Extract token from response
@@ -52,9 +53,9 @@ const Register = () => {
         <div className="space-y-4">
           <input
             type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setusername(e.target.value)}
+            placeholder="Code Number"
+            value={codenum}
+            onChange={(e) => setCodenum(e.target.value)}
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
@@ -73,6 +74,17 @@ const Register = () => {
             onChange={(e) => setPassword(e.target.value)}
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select Role</option>
+              <option value="collector">Collector</option>
+              <option value="counter">Counter</option>
+            </select>
+
 
           <button
             onClick={handleRegister}
