@@ -8,11 +8,14 @@ const AdminDashboard = () => {
   const [milkSellingData, setMilkSellingData] = useState([]);
   const [milkPurchasingData, setMilkPurchasingData] = useState([]);
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
+  const [supplierReport, setSupplierReport] = useState(null);
+  const [dailyMilkSales, setDailyMilkSales] = useState(0);
 
   // Fetch daily transactions on component mount
   useEffect(() => {
     fetchDailyTransactions();
     fetchMilkData();
+    fetchDailyMilkSales();
   }, []);
 
   // Function to fetch daily transactions
@@ -48,6 +51,26 @@ const AdminDashboard = () => {
     }
   };
 
+  // Fetch supplier report by code
+  const fetchSupplierReport = async (supplierCode) => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/supplier-report/${supplierCode}`);
+      setSupplierReport(response.data);
+    } catch (error) {
+      console.error('Error fetching supplier report:', error);
+    }
+  };
+
+  // Fetch daily milk sales
+  const fetchDailyMilkSales = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/daily-milk-sales');
+      setDailyMilkSales(response.data.totalSales);
+    } catch (error) {
+      console.error('Error fetching daily milk sales:', error);
+    }
+  };
+
   // Handle date range change
   const handleDateRangeChange = (e) => {
     setDateRange({ ...dateRange, [e.target.name]: e.target.value });
@@ -56,6 +79,13 @@ const AdminDashboard = () => {
   // Handle fetching transactions by date range
   const handleFetchTransactions = () => {
     fetchMonthlyTransactions();
+  };
+
+  // Handle supplier report generation
+  const handleSupplierReport = (e) => {
+    e.preventDefault();
+    const supplierCode = e.target.supplierCode.value;
+    fetchSupplierReport(supplierCode);
   };
 
   return (
@@ -123,6 +153,31 @@ const AdminDashboard = () => {
             <p>Fat Content: {milk.fatContent}</p>
           </div>
         ))}
+      </div>
+
+      {/* Generate Supplier Report */}
+      <div>
+        <h3>Supplier Report</h3>
+        <form onSubmit={handleSupplierReport}>
+          <label>
+            Supplier Code:
+            <input type="text" name="supplierCode" required />
+          </label>
+          <button type="submit">Generate Report</button>
+        </form>
+        {supplierReport && (
+          <div>
+            <h4>Report for Supplier Code: {supplierReport.supplierCode}</h4>
+            <p>Total Milk Supplied: {supplierReport.totalMilk}</p>
+            <p>Remaining Amount: {supplierReport.remainingAmount}</p>
+          </div>
+        )}
+      </div>
+
+      {/* Daily Milk Sales */}
+      <div>
+        <h3>Daily Milk Sales</h3>
+        <p>Total Milk Sold Today: {dailyMilkSales} liters</p>
       </div>
     </div>
   );
