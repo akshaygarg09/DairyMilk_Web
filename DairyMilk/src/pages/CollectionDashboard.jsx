@@ -14,7 +14,7 @@ const CollectionDashboard = () => {
     };
 
     try {
-      const response = await axios.post('http://localhost:5000/api/milk-purchase', purchaseData);
+      const response = await axios.post('http://localhost3000/api/milk-purchase', purchaseData);
       console.log('Milk purchased:', response.data);
     } catch (error) {
       console.error('Milk purchase failed', error);
