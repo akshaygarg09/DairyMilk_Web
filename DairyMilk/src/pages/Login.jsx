@@ -11,7 +11,7 @@ const Login = () => {
   const handleLogin = async () => {
     try {
       // Make API call using Axios
-      const response = await axios.post("http://localhost:3000/api/login", { username:name, password });
+      const response = await axios.post("http://localhost:3000/api/login", { codenumber:name, password });
 
       const { token, role } = response.data;
 

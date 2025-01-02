@@ -14,7 +14,7 @@ const Register = () => {
     try {
       // Make API call to the backend
       const response = await axios.post("http://localhost:3000/api/register", {
-        username : codenum,
+        codenumber : codenum,
         phone,
         password,
         role, 
@@ -86,6 +86,7 @@ const Register = () => {
               <option value="">Select Role</option>
               <option value="collector">Collector</option>
               <option value="counter">Counter</option>
+              <option value="supplier">Supplier</option>
             </select>
 
 

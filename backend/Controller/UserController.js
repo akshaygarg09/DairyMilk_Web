@@ -20,15 +20,15 @@ export default class UserController {
   static async registerUser(req, res) {
     let connection;
     try {
-        const { username, phone, password,role } = req.body;
+        const { codenumber, phone, password,role } = req.body;
         console.log("Incoming request to /api/register with body:", req.body);
 
         // Input validation
-        if (!username || !phone || !password) {
-            return res.status(400).json({ message: "Username, phone, and password are required" });
+        if (!codenumber || !phone || !password) {
+            return res.status(400).json({ message: "codenumber, phone, and password are required" });
         }
 
-        const validRoles = ["counter", "collector"];
+        const validRoles = ["counter", "collector","supplier"];
         if (!validRoles.includes(role)) {
             return res.status(400).json({ 
                 message: "Invalid role", 
@@ -41,8 +41,8 @@ export default class UserController {
 
         // Check for existing user
         const [existingUsers] = await connection.query(
-            "SELECT * FROM Users WHERE username = ?",
-            [username]
+            "SELECT * FROM Users WHERE codenumber = ?",
+            [codenumber]
         );
 
         // Log the existing users to verify
@@ -50,7 +50,7 @@ export default class UserController {
 
         // Check if user already exists
         if (existingUsers.length > 0) {
-            return res.status(409).json({ message: "Username already exists" });
+            return res.status(409).json({ message: "codenumber already exists" });
         }
 
         // Encrypt the password
@@ -58,14 +58,14 @@ export default class UserController {
 
         // Insert the new user into the database
         const [insertResult] = await connection.query(
-            "INSERT INTO Users (username, phone, password, role) VALUES (?, ?, ?, ?)",
-            [username, phone, hashedPassword, role]
+            "INSERT INTO Users (codenumber, phone, password, role) VALUES (?, ?, ?, ?)",
+            [codenumber, phone, hashedPassword, role]
         );
 
         // Generate token using the newly inserted user's ID
         const token = jwt.sign(
             { 
-                username: username, 
+                codenumber: codenumber, 
                 role: role 
             }, 
             process.env.JWT_SECRET, 
@@ -76,7 +76,7 @@ export default class UserController {
             message: "User registered successfully",
             token: token,
             user: {
-                username: username,
+                codenumber: codenumber,
                 role: role
             }
         });
@@ -100,16 +100,16 @@ export default class UserController {
       // Log the entire request body to see what's coming through
       console.log("Full request body:", req.body);
 
-      const { username, password } = req.body;
+      const { codenumber, password } = req.body;
 
       // More detailed logging
-      console.log("Username:", username);
+      console.log("codenumber:", codenumber);
       console.log("Password:", password ? "***** (present)" : "not provided");
 
       // Input validation with more robust checking
-      if (!username || username.trim() === '' || !password || password.trim() === '') {
+      if (!codenumber || codenumber.trim() === '' || !password || password.trim() === '') {
         return res.status(400).json({ 
-          message: "Username and password are required",
+          message: "codenumber and password are required",
           receivedBody: req.body
         });
       }
@@ -118,15 +118,15 @@ export default class UserController {
 
       // Use array destructuring with query
       const [userRows] = await connection.query(
-        "SELECT * FROM Users WHERE username = ?",
-        [username]
+        "SELECT * FROM Users WHERE codenumber = ?",
+        [codenumber]
       );
 
       // Log found users
       console.log("Found users:", userRows);
 
       if (userRows.length === 0) {
-        return res.status(401).json({ message: "Invalid username or password" });
+        return res.status(401).json({ message: "Invalid codenumber or password" });
       }
 
       const user = userRows[0];
@@ -139,9 +139,9 @@ export default class UserController {
 
         if (!isPasswordValid) {
           return res.status(401).json({ 
-            message: "Invalid username or password",
+            message: "Invalid codenumber or password",
             debugInfo: {
-              usernameMatch: true,
+              codenumberMatch: true,
               passwordValidation: false
             }
           });
@@ -149,9 +149,8 @@ export default class UserController {
 
         // Generate a JWT token
         const token = jwt.sign(
-          { 
-            id: user.id, 
-            username: user.username, 
+          {  
+            codenumber: user.codenumber, 
             role: user.role, 
             phone: user.phone 
           },
@@ -196,7 +195,7 @@ export default class UserController {
 
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = decoded; // Attach user info to request object
+      req.user = decoded.codenumber; // Attach user info to request object
       next(); // Proceed to the next middleware/route handler
     } catch (error) {
       console.error("Invalid token:", error.message);
@@ -207,12 +206,12 @@ export default class UserController {
   static async registerAdmin(req, res) {
     let connection;
     try {
-        const { username, phone, password } = req.body;
+        const { codenumber, phone, password } = req.body;
         console.log("Incoming request to /api/register with body:", req.body);
 
         // Input validation
-        if (!username || !phone || !password) {
-            return res.status(400).json({ message: "Username, phone, and password are required" });
+        if (!codenumber || !phone || !password) {
+            return res.status(400).json({ message: "codenumber, phone, and password are required" });
         }
 
         // Create connection
@@ -220,8 +219,8 @@ export default class UserController {
 
         // Check for existing user
         const [existingUsers] = await connection.query(
-            "SELECT * FROM Users WHERE username = ?",
-            [username]
+            "SELECT * FROM Users WHERE codenumber = ?",
+            [codenumber]
         );
 
         // Log the existing users to verify
@@ -229,7 +228,7 @@ export default class UserController {
 
         // Check if user already exists
         if (existingUsers.length > 0) {
-            return res.status(409).json({ message: "Username already exists" });
+            return res.status(409).json({ message: "codenumber already exists" });
         }
 
         // Encrypt the password
@@ -237,14 +236,14 @@ export default class UserController {
 
         // Insert the new user into the database
         const [insertResult] = await connection.query(
-            "INSERT INTO Users (username, phone, password, role) VALUES (?, ?, ?, ?)",
-            [username, phone, hashedPassword, "admin"]
+            "INSERT INTO Users (codenumber, phone, password, role) VALUES (?, ?, ?, ?)",
+            [codenumber, phone, hashedPassword, "admin"]
         );
 
         // Generate token using the newly inserted user's ID
         const token = jwt.sign(
             { 
-                username: username, 
+                codenumber: codenumber, 
                 role: "admin" 
             }, 
             process.env.JWT_SECRET, 
@@ -255,7 +254,7 @@ export default class UserController {
             message: "User registered successfully",
             token: token,
             user: {
-                username: username,
+                codenumber: codenumber,
                 role: "admin"
             }
         });
