@@ -7,14 +7,14 @@ export const createMilkPurschaseTable = async () => {
   // SQL query to create the Users table if it does not exist
   const query = `
     CREATE TABLE IF NOT EXISTS Milk_Purchase (
-      counter_id VARCHAR(255) ,  
-      supplier_no VARCHAR(255),
+      counter_id VARCHAR(255) NOT NULL,  
+      supplier_no VARCHAR(255)NOT NULL,
       milk_type ENUM('Buffalo', 'Cow') NOT NULL,
       quantity FLOAT NOT NULL CHECK (quantity >= 0),
       fat_content FLOAT NOT NULL CHECK (fat_content >= 0 AND fat_content <= 100),
       sample_no VARCHAR(255) NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (counter_id) REFERENCES users(codenumber) ON UPDATE CASCADE ON DELETE SET NULL
+      FOREIGN KEY (counter_id) REFERENCES users(codenumber) ON UPDATE CASCADE ON DELETE CASCADE
     );
   `;
 

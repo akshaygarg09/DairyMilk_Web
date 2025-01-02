@@ -40,8 +40,8 @@ const MilkPurchase = () => {
       const {message} =response.data;
       if (message ==="success") {
         toast.success("Milk purchased successfully");
+
         setCodeNo('');
-        setMilkType('');
         setQuantity('');
         setFat('');
         setSampleNo('');
@@ -49,7 +49,6 @@ const MilkPurchase = () => {
         toast.error("Purchase failed");
       }
     } catch (err) {
-      console.error(err);
       toast.error("Error during milk purchase");
     }
   };
