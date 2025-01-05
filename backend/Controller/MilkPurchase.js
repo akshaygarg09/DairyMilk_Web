@@ -1,8 +1,7 @@
-import dotenv from "dotenv";
 import createConnection from "../config/db.js";
 import { createMilkPurschaseTable } from "../Model/CounterModel.js";
 
-dotenv.config();
+
 
 (async () => {
     try {

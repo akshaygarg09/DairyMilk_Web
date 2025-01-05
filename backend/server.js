@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import UserController from "./Controller/UserController.js";
 import MilkPurchase from "./Controller/MilkPurchase.js";
+import MilkCollect from "./Controller/MilkCollection.js";
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.post("/api/register", UserController.registerUser);
 app.post("/api/login", UserController.loginUser);
 app.post("/api/adminregister",UserController.registerAdmin);
 app.post("/api/milkpurchase",MilkPurchase.milk_purchase);
+app.post("/api/milkcollection",MilkCollect.milk_collect);
 
 app.get("/", (req, res) => {
   res.send("Server is up and running!");
