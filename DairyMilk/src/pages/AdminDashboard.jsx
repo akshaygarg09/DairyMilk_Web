@@ -1,87 +1,80 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const AdminDashboard = () => {
-  // State variables for transactions and receipts
-  const [dailyTransactions, setDailyTransactions] = useState({ selling: [], purchasing: [] });
+  const [dailyTransactions, setDailyTransactions] = useState(0);
   const [monthlyTransactions, setMonthlyTransactions] = useState([]);
   const [milkSellingData, setMilkSellingData] = useState([]);
   const [milkPurchasingData, setMilkPurchasingData] = useState([]);
-  const [dateRange, setDateRange] = useState({ start: '', end: '' });
+  const [dateRange, setDateRange] = useState({ start: "", end: "" });
   const [supplierReport, setSupplierReport] = useState(null);
   const [dailyMilkSales, setDailyMilkSales] = useState(0);
 
-  // Fetch daily transactions on component mount
   useEffect(() => {
     fetchDailyTransactions();
     fetchMilkData();
     fetchDailyMilkSales();
   }, []);
 
-  // Function to fetch daily transactions
   const fetchDailyTransactions = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/daily-transactions');
-      setDailyTransactions(response.data);
+      const response = await axios.get("http://localhost:3000/api/dailypurchase");
+      console.log("Response:", response.data); // Log the response data
+      setDailyTransactions(response.data.total_stock || 0);
     } catch (error) {
-      console.error('Error fetching daily transactions:', error);
+      toast.error(`Error fetching daily transactions: ${error.message}`);
     }
+    
   };
 
-  // Function to fetch monthly transactions based on date range
   const fetchMonthlyTransactions = async () => {
     const { start, end } = dateRange;
     try {
-      const response = await axios.post('http://localhost:5000/api/monthly-transactions', { start, end });
+      const response = await axios.post("http://localhost:3000/api/monthly-transactions", { start, end });
       setMonthlyTransactions(response.data);
     } catch (error) {
-      console.error('Error fetching monthly transactions:', error);
+      // console.error("Error fetching monthly transactions:", error);
     }
   };
 
-  // Fetch milk purchase and selling data for admin
   const fetchMilkData = async () => {
     try {
-      const sellingResponse = await axios.get('http://localhost:5000/api/milk-selling');
-      const purchasingResponse = await axios.get('http://localhost:5000/api/milk-purchase');
+      const sellingResponse = await axios.get("http://localhost:3000/api/milk-selling");
+      const purchasingResponse = await axios.get("http://localhost:3000/api/milk-purchase");
       setMilkSellingData(sellingResponse.data);
       setMilkPurchasingData(purchasingResponse.data);
     } catch (error) {
-      console.error('Error fetching milk data:', error);
+      //console.error("Error fetching milk data:", error);
     }
   };
 
-  // Fetch supplier report by code
   const fetchSupplierReport = async (supplierCode) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/supplier-report/${supplierCode}`);
+      const response = await axios.get(`http://localhost:3000/api/supplier-report/${supplierCode}`);
       setSupplierReport(response.data);
     } catch (error) {
-      console.error('Error fetching supplier report:', error);
+      //console.error("Error fetching supplier report:", error);
     }
   };
 
-  // Fetch daily milk sales
   const fetchDailyMilkSales = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/daily-milk-sales');
+      const response = await axios.get("http://localhost:3000/api/daily-milk-sales");
       setDailyMilkSales(response.data.totalSales);
     } catch (error) {
-      console.error('Error fetching daily milk sales:', error);
+      // console.error("Error fetching daily milk sales:", error);
     }
   };
 
-  // Handle date range change
   const handleDateRangeChange = (e) => {
     setDateRange({ ...dateRange, [e.target.name]: e.target.value });
   };
 
-  // Handle fetching transactions by date range
   const handleFetchTransactions = () => {
     fetchMonthlyTransactions();
   };
 
-  // Handle supplier report generation
   const handleSupplierReport = (e) => {
     e.preventDefault();
     const supplierCode = e.target.supplierCode.value;
@@ -89,95 +82,115 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div>
-      <h2>Admin Dashboard</h2>
+    <div className="min-h-screen bg-gray-100 p-6">
+      <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">Admin Dashboard</h1>
 
-      {/* Milk Purchase and Milk Selling Transaction Overview */}
-      <div>
-        <h3>Daily Transactions Overview</h3>
-        <p><strong>Milk Selling:</strong> {dailyTransactions.selling.length} transactions</p>
-        <p><strong>Milk Purchasing:</strong> {dailyTransactions.purchasing.length} transactions</p>
+      {/* Daily Transactions Overview */}
+      <div className="bg-white shadow-md rounded-lg p-6 mb-6">
+        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Daily Transactions Overview</h2>
+        <p className="text-gray-600">
+          <strong>Milk Selling:0 transactions</strong> 
+        </p>
+        <p className="text-gray-600">
+          <strong>Milk Purchasing:</strong> {dailyTransactions||0} transactions
+        </p>
       </div>
 
       {/* Filter Monthly Transactions */}
-      <div>
-        <h3>Filter Monthly Transactions</h3>
-        <input
-          type="date"
-          name="start"
-          value={dateRange.start}
-          onChange={handleDateRangeChange}
-        />
-        <input
-          type="date"
-          name="end"
-          value={dateRange.end}
-          onChange={handleDateRangeChange}
-        />
-        <button onClick={handleFetchTransactions}>Filter Transactions</button>
+      <div className="bg-white shadow-md rounded-lg p-6 mb-6">
+        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Filter Monthly Transactions</h2>
+        <div className="flex gap-4">
+          <input
+            type="date"
+            name="start"
+            value={dateRange.start}
+            onChange={handleDateRangeChange}
+            className="border border-gray-300 rounded-lg p-2 w-full"
+          />
+          <input
+            type="date"
+            name="end"
+            value={dateRange.end}
+            onChange={handleDateRangeChange}
+            className="border border-gray-300 rounded-lg p-2 w-full"
+          />
+          <button
+            onClick={handleFetchTransactions}
+            className="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600"
+          >
+            Filter
+          </button>
+        </div>
       </div>
 
       {/* Monthly Transactions Data */}
-      <div>
-        <h3>Monthly Transactions</h3>
+      <div className="bg-white shadow-md rounded-lg p-6 mb-6">
+        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Monthly Transactions</h2>
         {monthlyTransactions.length > 0 ? (
           monthlyTransactions.map((transaction) => (
-            <div key={transaction.id}>
-              <p>Milk Type: {transaction.milkType}</p>
-              <p>Quantity: {transaction.quantity}</p>
-              <p>Total: {transaction.total}</p>
+            <div key={transaction.id} className="border-b border-gray-200 py-2">
+              <p className="text-gray-600">Milk Type: {transaction.milkType}</p>
+              <p className="text-gray-600">Quantity: {transaction.quantity}</p>
+              <p className="text-gray-600">Total: {transaction.total}</p>
             </div>
           ))
         ) : (
-          <p>No transactions found for the selected range.</p>
+          <p className="text-gray-500">No transactions found for the selected range.</p>
         )}
       </div>
 
       {/* Milk Selling Data */}
-      <div>
-        <h3>Milk Selling Data</h3>
+      <div className="bg-white shadow-md rounded-lg p-6 mb-6">
+        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Milk Selling Data</h2>
         {milkSellingData.map((milk) => (
-          <div key={milk.id}>
-            <p>Milk Type: {milk.milkType}</p>
-            <p>Price Rate: {milk.priceRate}</p>
+          <div key={milk.id} className="border-b border-gray-200 py-2">
+            <p className="text-gray-600">Milk Type: {milk.milkType}</p>
+            <p className="text-gray-600">Price Rate: {milk.priceRate}</p>
           </div>
         ))}
       </div>
 
       {/* Milk Purchasing Data */}
-      <div>
-        <h3>Milk Purchasing Data</h3>
+      <div className="bg-white shadow-md rounded-lg p-6 mb-6">
+        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Milk Purchasing Data</h2>
         {milkPurchasingData.map((milk) => (
-          <div key={milk.id}>
-            <p>Milk Type: {milk.milkType}</p>
-            <p>Fat Content: {milk.fatContent}</p>
+          <div key={milk.id} className="border-b border-gray-200 py-2">
+            <p className="text-gray-600">Milk Type: {milk.milkType}</p>
+            <p className="text-gray-600">Fat Content: {milk.fatContent}</p>
           </div>
         ))}
       </div>
 
       {/* Generate Supplier Report */}
-      <div>
-        <h3>Supplier Report</h3>
-        <form onSubmit={handleSupplierReport}>
-          <label>
-            Supplier Code:
-            <input type="text" name="supplierCode" required />
-          </label>
-          <button type="submit">Generate Report</button>
+      <div className="bg-white shadow-md rounded-lg p-6 mb-6">
+        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Supplier Report</h2>
+        <form onSubmit={handleSupplierReport} className="flex gap-4 items-center">
+          <input
+            type="text"
+            name="supplierCode"
+            placeholder="Enter Supplier Code"
+            className="border border-gray-300 rounded-lg p-2 w-full"
+            required
+          />
+          <button type="submit" className="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600">
+            Generate
+          </button>
         </form>
         {supplierReport && (
-          <div>
-            <h4>Report for Supplier Code: {supplierReport.supplierCode}</h4>
-            <p>Total Milk Supplied: {supplierReport.totalMilk}</p>
-            <p>Remaining Amount: {supplierReport.remainingAmount}</p>
+          <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+            <h3 className="text-xl font-semibold text-gray-700">Report for Supplier Code: {supplierReport.supplierCode}</h3>
+            <p className="text-gray-600">Total Milk Supplied: {supplierReport.totalMilk}</p>
+            <p className="text-gray-600">Remaining Amount: {supplierReport.remainingAmount}</p>
           </div>
         )}
       </div>
 
       {/* Daily Milk Sales */}
-      <div>
-        <h3>Daily Milk Sales</h3>
-        <p>Total Milk Sold Today: {dailyMilkSales} liters</p>
+      <div className="bg-white shadow-md rounded-lg p-6">
+        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Daily Milk Sales</h2>
+        <p className="text-gray-600 imb-2">Total Milk Sold Today: {dailyMilkSales} liters</p>
+        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Daily Milk Purchase</h2>
+        <p className="text-gray-600">Total Milk purschase Today: {dailyTransactions} liters</p>
       </div>
     </div>
   );

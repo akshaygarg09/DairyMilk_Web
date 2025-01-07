@@ -46,5 +46,44 @@ export default class MilkPurchase{
             connection.end();
           }  
         }
-    }      
+    } 
+    
+    static async daily_milk(req, res) {
+      let connection;
+      try {
+        // Establish a database connection
+        connection = await createConnection();
+    
+        // Execute the query
+        const [rows] = await connection.query(
+          `SELECT 
+            (IFNULL(SUM(mp.quantity), 0) + IFNULL(SUM(mc.quantity), 0)) AS total_stock
+          FROM 
+            milk_purchase mp
+          LEFT JOIN 
+            milk_collection mc ON DATE(mp.created_at) = DATE(mc.created_at)
+          WHERE 
+            DATE(mp.created_at) = CURDATE() OR DATE(mc.created_at) = CURDATE();`
+        );
+    
+    
+        if (rows && rows.length > 0) {
+          res.status(200).json({
+            total_stock: rows[0].total_stock, // Use rows[0] to access the first row
+          });
+        } else {
+          res.status(200).json({
+            total_stock: 0, // Default to 0 if no rows are returned
+          });
+        }
+      } catch (error) {
+        console.error('Error executing query:', error.message);
+        res.status(500).json({ error: 'Database query failed' });
+      } finally {
+        if (connection) {
+          await connection.end(); 
+        }
+      }
+    }
+    
 }

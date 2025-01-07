@@ -13,7 +13,7 @@ const Adminregister = () => {
     try {
       // Make API call to the backend
       const response = await axios.post("http://localhost:3000/api/adminregister", {
-        username,
+        codenumber:username,
         phone,
         password,
         role: "admin", // Ensure role is passed as "counter"
@@ -31,8 +31,7 @@ const Adminregister = () => {
   
       // Redirect to the counter page after successful registration
       navigate("/admin");
-    } catch (error) {
-      console.error("API Error:", error); // Log full error for debugging
+    } catch (error) { // Log full error for debugging
       if (error.response) {
         toast.error(error.response.data.message || "Registration failed");
       } else {

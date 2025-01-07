@@ -21,6 +21,7 @@ app.post("/api/login", UserController.loginUser);
 app.post("/api/adminregister",UserController.registerAdmin);
 app.post("/api/milkpurchase",MilkPurchase.milk_purchase);
 app.post("/api/milkcollection",MilkCollect.milk_collect);
+app.get("/api/dailypurchase",MilkPurchase.daily_milk)
 
 app.get("/", (req, res) => {
   res.send("Server is up and running!");
